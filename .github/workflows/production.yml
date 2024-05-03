@@ -1,0 +1,34 @@
+# .github/workflows/production.yml
+name: Production Pipeline
+
+# Trigger the workflow when code is pushed to the 'production' branch
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu environment for the workflow
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3  # Checkout the repository's code
+      
+      - name: Set Up PHP
+        uses: shivammathur/setup-php@v2  # Set up PHP environment
+        with:
+          php-version: '8.1'  # Adjust the PHP version as needed
+          tools: composer  # Include Composer
+      
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist  # Install project dependencies
+      
+      - name: Run Laravel Migrations
+        run: php artisan migrate --force  # Apply database migrations with --force in production
+      
+      - name: Seed the Database
+        run: php artisan db:seed --force  # Seed the database with --force to ensure no interaction is required
+      
+      - name: Run Laravel Tests
+        run: php artisan test  # Execute Laravel tests
